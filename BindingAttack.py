@@ -13,35 +13,47 @@ def makeHash(k , v, outputSize):
     cutHexString = int(bitString, 2).to_bytes(16, byteorder='big')
     return cutHexString
 
+# The receiver of the commitment performs the attack
 def conceilingAttack():
     x = list()
     y = list()
-    # @TODO Implement attack 
+    k = random.getrandbits(16)
+    v = random.getrandbits(1)
+    for sizeOfHash in range(1, 129): # As MD5 has 128 bit output.
+        x.append(sizeOfHash)
+        commitment = makeHash(k, v, sizeOfHash)
+        hits = 0
+        for kTest in range(0, pow(2,16)):
+            for vTest in range(1):
+                if(makeHash(kTest, vTest, sizeOfHash) == commitment):
+                    hits += 1
+        print("For K size " + str(sizeOfHash) + ", hits:", str(hits))
+        y.append(hits / pow(2, 16))
     plot.plot(x, y)
-    plot.xlabel('size of hash')
-    plot.ylabel('Probability for collision')
+    plot.xlabel('Size of hash')
+    plot.ylabel('Probability of breaking conceiling')
     plot.title('Simulation')
     plot.show()
 
+#The creator of the commitment performs the attack
 def bindingAttack():
     x = list()
     y = list()
-    for sizeOfK in range(1, 129): # As MD5 has 128 bit output.
-        x.append(sizeOfK)
-        commitment = makeHash(0, 0, sizeOfK)
+    for sizeOfHash in range(1, 129): # As MD5 has 128 bit output.
+        x.append(sizeOfHash)
+        commitment = makeHash(0, 0, sizeOfHash)
         hits = 0
         for k in range(0, pow(2,16)):
-            if(makeHash(k, 1, sizeOfK) == commitment):
+            if(makeHash(k, 1, sizeOfHash) == commitment):
                 hits += 1
-        print("For K size " + str(sizeOfK) + ", hits:", str(hits))
+        print("For K size " + str(sizeOfHash) + ", hits:", str(hits))
         y.append(hits / pow(2, 16))
     plot.plot(x, y)
-    plot.xlabel('size of hash')
-    plot.ylabel('Probability for collision')
+    plot.xlabel('Size of hash')
+    plot.ylabel('Probability of breaking binding')
     plot.title('Simulation')
     plot.show()
 
 if __name__ == '__main__':
-
-    bindingAttack()
+    #bindingAttack()
     conceilingAttack()
