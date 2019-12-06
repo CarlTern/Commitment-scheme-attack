@@ -19,7 +19,7 @@ def conceilingAttack():
     y = list()
     k = random.getrandbits(16)
     v = random.getrandbits(1)
-    for sizeOfHash in range(1, 30): # As MD5 has 128 bit output.
+    for sizeOfHash in range(1, 129): # As MD5 has 128 bit output.
         x.append(sizeOfHash)
         commitment = makeHash(k, v, sizeOfHash)
         hits = 0
