@@ -19,16 +19,16 @@ def conceilingAttack():
     y = list()
     k = random.getrandbits(16)
     v = random.getrandbits(1)
-    for sizeOfHash in range(1, 129): # As MD5 has 128 bit output.
+    for sizeOfHash in range(1, 30): # As MD5 has 128 bit output.
         x.append(sizeOfHash)
         commitment = makeHash(k, v, sizeOfHash)
         hits = 0
         for kTest in range(0, pow(2,16)):
-            for vTest in range(1):
-                if(makeHash(kTest, vTest, sizeOfHash) == commitment):
+            for vTest in range(2):
+                if(makeHash(kTest, vTest, sizeOfHash) == commitment and vTest == v):
                     hits += 1
         print("For K size " + str(sizeOfHash) + ", hits:", str(hits))
-        y.append(hits / pow(2, 16))
+        y.append(hits / (2 * pow(2, 16)))
     plot.plot(x, y)
     plot.xlabel('Size of hash')
     plot.ylabel('Probability of breaking conceiling')
