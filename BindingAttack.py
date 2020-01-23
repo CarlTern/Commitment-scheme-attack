@@ -1,8 +1,6 @@
 import hashlib
-import timeit
 import matplotlib.pyplot as plot
 import random
-import tkinter
 
 def makeHash(k , v, outputSize):
     m = hashlib.md5()
@@ -14,21 +12,31 @@ def makeHash(k , v, outputSize):
     return cutHexString
 
 # The receiver of the commitment performs the attack
+#We want to prove a a collition between ANY hashes since then we can change the vote. 
 def conceilingAttack():
     x = list()
     y = list()
     k = random.getrandbits(16)
     v = random.getrandbits(1)
-    for sizeOfHash in range(1, 129): # As MD5 has 128 bit output.
+    for sizeOfHash in range(1, 30): # As MD5 has 128 bit output.
         x.append(sizeOfHash)
         commitment = makeHash(k, v, sizeOfHash)
         hits = 0
+        uniqueHits = 0
+        hashes = list()
         for kTest in range(0, pow(2,16)):
-            for vTest in range(1):
-                if(makeHash(kTest, vTest, sizeOfHash) == commitment):
-                    hits += 1
+            v1Hash = makeHash(kTest, 1, sizeOfHash)
+            v0Hash = makeHash(kTest, 0, sizeOfHash)
+            if(v0Hash == commitment):
+                hits += 1
+            if (v1Hash == commitment):
+                hits +=1
+        if (hits is 1):
+            uniqueHits += 1
+
         print("For K size " + str(sizeOfHash) + ", hits:", str(hits))
-        y.append(hits / pow(2, 16))
+        #y.append(1 / hits)
+        y.append(uniqueHits / pow(2, sizeOfHash))
     plot.plot(x, y)
     plot.xlabel('Size of hash')
     plot.ylabel('Probability of breaking conceiling')
@@ -36,6 +44,7 @@ def conceilingAttack():
     plot.show()
 
 #The creator of the commitment performs the attack
+# We want to be certain of the vote howto? If many collisions => Hard to be certain of the vote. 
 def bindingAttack():
     x = list()
     y = list()
@@ -46,8 +55,9 @@ def bindingAttack():
         for k in range(0, pow(2,16)):
             if(makeHash(k, 1, sizeOfHash) == commitment):
                 hits += 1
+                break   #( · ͜͞ʖ·) ̿'̿'\̵͇̿̿\з
         print("For K size " + str(sizeOfHash) + ", hits:", str(hits))
-        y.append(hits / pow(2, 16))
+        y.append(hits)
     plot.plot(x, y)
     plot.xlabel('Size of hash')
     plot.ylabel('Probability of breaking binding')
